@@ -15,7 +15,7 @@ class CreateCategoryDescriptionsTable extends Migration
     {
         Schema::create('category_descriptions', function (Blueprint $table) {
             $table->id();
-            $table->string("lenguage")->default("es");
+            $table->string("language")->default("es");
             $table->string("name");
 
 
@@ -24,7 +24,7 @@ class CreateCategoryDescriptionsTable extends Migration
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
 
-            $table->unique(['category_id',"lenguage"]);
+            $table->unique(['category_id',"language"]);
 
             $table->softDeletes();
             $table->timestamps();

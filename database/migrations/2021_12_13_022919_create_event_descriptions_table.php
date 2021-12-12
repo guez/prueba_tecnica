@@ -16,13 +16,13 @@ class CreateEventDescriptionsTable extends Migration
         Schema::create('event_descriptions', function (Blueprint $table) {
             $table->id();
 
-            $table->string("lenguage")->default("es");
+            $table->string("language")->default("es");
             $table->string("name");
             
             $table->unsignedBigInteger('event_id');
             $table->foreign('event_id')->references('id')->on('events');
             
-            $table->unique(['event_id',"lenguage"]);
+            $table->unique(['event_id',"language"]);
 
             $table->softDeletes();
             $table->timestamps();
