@@ -98,7 +98,7 @@ var app_events_create = new Vue({
                 return false;
             }
 
-            if (this.capacity == 0) {
+            if (this.capacity <= 0) {
                 Toast.fire({
                     icon: 'warning',
                     title: 'La capacidad del Evento debe ser mayor a 0.'
@@ -108,7 +108,10 @@ var app_events_create = new Vue({
 
 
             if (!this.isTheDateAfterNow(this.date)) {
-                alert("La fecha del evento debe ser posterior a la fecha actual");
+                Toast.fire({
+                    icon: 'warning',
+                    title: "La fecha del evento debe ser posterior a la fecha actual"
+                })
                 return false;
             }
 
@@ -145,10 +148,10 @@ var app_events_create = new Vue({
                 })
                 .catch(err => {
                     console.log(err);
-                    // Toast.fire({
-                    //     icon: 'error',
-                    //     title: 'Ha ocurrido un error.'
-                    // }).then(rs=>cons);
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Ha ocurrido un error.'
+                    })
                 });
         }
 
