@@ -228,8 +228,40 @@ class EventController extends Controller
             "code" => 202,
             "data" => $event
         ]);
+    }
 
-        return new JsonResponse($request->all());
+
+    /**
+     * Update Partially the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePartially(Request $request, $id)
+    {
+        $field = $request->validate([
+            "slug"              => "max:255",
+            "capacity"          => "min:1",
+            "date"              => "date|after:start_date",
+            "category_id"       => "exists:categories,id",
+        ]);
+
+        DB::beginTransaction();
+        $event = Event::findOrFail($id);
+        if ($field['category_id'] != "")    $event['category_id'] = $field['category_id'];
+        if ($field['capacity'] != "")       $event['capacity'] =    $field['capacity'];
+        if ($field['slug'] != "")           $event['slug'] =        $field['slug'];
+        if ($field['date'] != "")           $event['date'] =        $field['date'];
+        $event->update();
+        DB::commit();
+
+        return new JsonResponse([
+            "state" => true,
+            "code" => 202,
+            "event" => $event
+        ]);
+
     }
 
     /**
