@@ -25,7 +25,7 @@ class EventDescriptionController extends Controller
             ->get();
 
         return new JsonResponse([
-            "status" => true,
+            "state" => true,
             "code" => 200,
             "event_descriptions" => $eventDescriptions
         ]);
@@ -50,17 +50,23 @@ class EventDescriptionController extends Controller
         $eventDescription = EventDescription::query()
             ->where("event_id", '=', $fields['event_id'])
             ->where("language", '=', $fields['language'])
+            ->withTrashed()
             ->first();
 
         if ($eventDescription != null) {
             $eventDescription->name = $fields['name'];
             $eventDescription->update();
-
+            $typeEvent = "UPDATE";
+            if($eventDescription->trashed())
+            {
+                $eventDescription->restore();
+                $typeEvent = "RESTORE";
+            }
             return new Jsonresponse([
-                "status" => true,
+                "state" => true,
                 "code" => 200,
                 "event_description" => $eventDescription,
-                "type_event" => "UPDATE"
+                "type_event" => $typeEvent
             ]);
         }
 
@@ -68,7 +74,7 @@ class EventDescriptionController extends Controller
         $eventDescription->save();
 
         return new Jsonresponse([
-            "status" => true,
+            "state" => true,
             "code" => 202,
             "event_description" => $eventDescription,
             "type_event" =>  "CREATE"
@@ -86,7 +92,7 @@ class EventDescriptionController extends Controller
         $eventDescription = EventDescription::findOrFail($id);
 
         return new JsonResponse([
-            "status" => true,
+            "state" => true,
             "code" => 200,
             "event_description" => $eventDescription
         ]);
@@ -113,8 +119,10 @@ class EventDescriptionController extends Controller
     public function destroy($id)
     {
         $eventDescription = EventDescription::findOrFail($id);
+        $eventDescription->delete();
+        
         return new Jsonresponse([
-            "status" => true,
+            "state" => true,
             "code" => 200,
             "event_description" => $eventDescription
         ]);
