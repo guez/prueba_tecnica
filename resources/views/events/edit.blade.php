@@ -38,7 +38,7 @@ Listado
             </select>
         </div>
         <div class="col-12 text-center mt-4">
-            <button class="btn btn-success"><i class="fa fa-plus"></i> Guardar</button>
+            <button @click="updateEvent()" class="btn btn-success"><i class="fa fa-sync"></i> Actualizar</button>
         </div>
     </div>
     <br>
@@ -101,10 +101,12 @@ Listado
         var event = @json($event);
         var eventDescriptions = @json($event_descriptions);
     
-        app_events_create.setUrlCreateDescription('{{ route('eventsDescriptions.store') }}');
+        app_events_edit.setUrlCreateDescription('{{ route('eventsDescriptions.store') }}');
+        app_events_edit.setUrlUpdatePartially('{{ route('events.update_partially', $event["id"]) }}');
+        
 
-        app_events_create.setCategories(data_categories);
-        app_events_create.loadData({
+        app_events_edit.setCategories(data_categories);
+        app_events_edit.loadData({
             descriptions: eventDescriptions,
             ...event,
         });
