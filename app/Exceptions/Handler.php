@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Facade\FlareClient\Http\Exceptions\NotFound;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use League\Flysystem\FileNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -34,8 +37,18 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    "errors" => [
+                        'message' => 'Recurso no encontrado.'
+                    ]
+                ], 417);
+            }
+        });
+
         $this->reportable(function (Throwable $e) {
-            //
+            // dd("safdsf");
         });
     }
 }

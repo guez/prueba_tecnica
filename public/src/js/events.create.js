@@ -147,11 +147,16 @@ var app_events_create = new Vue({
                     }).then(rs=>window.location.reload());
                 })
                 .catch(err => {
-                    console.log(err);
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Ha ocurrido un error.'
-                    })
+                    let errors = err.response.data.errors;
+                    if (errors != undefined) {
+                        console.log(errors);
+                        Object.keys(errors).forEach(keyError => {
+                            Toast.fire({
+                                icon: 'error',
+                                title: errors[keyError]
+                            })
+                        });
+                    }
                 });
         }
 

@@ -111,8 +111,6 @@ var app_events_edit = new Vue({
 
                 })
                 .catch(err => {
-                    console.log(err);
-                    console.log(err.response);
                     let errors = err.response.data.errors;
                     if (errors != undefined) {
                         console.log(errors);
@@ -127,7 +125,7 @@ var app_events_edit = new Vue({
         },
 
         createNewDescription: function () {
-            if(this.newDescription.name == ""){
+            if (this.newDescription.name == "") {
                 Toast.fire({
                     icon: 'warning',
                     title: 'El nombre de la descripción es requerido.'
@@ -175,18 +173,24 @@ var app_events_edit = new Vue({
                                 title: 'Se ha detectado el lenguaje ingresado, se ha restaurado y se actualizó correctamente.'
                             });
                         }
-                        
+
                         this.newDescription.name = "";
                         this.newDescription.language = "";
-                        
+
                     }
 
                 })
                 .catch(err => {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Ha ocurrido un error.'
-                    })
+                    let errors = err.response.data.errors;
+                    if (errors != undefined) {
+                        console.log(errors);
+                        Object.keys(errors).forEach(keyError => {
+                            Toast.fire({
+                                icon: 'error',
+                                title: errors[keyError]
+                            })
+                        });
+                    }
                 });
         },
 
@@ -230,10 +234,16 @@ var app_events_edit = new Vue({
                     }
                 })
                 .catch(err => {
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Ha ocurrido un error.'
-                    }).then(rs => window.location.reload());
+                    let errors = err.response.data.errors;
+                    if (errors != undefined) {
+                        console.log(errors);
+                        Object.keys(errors).forEach(keyError => {
+                            Toast.fire({
+                                icon: 'error',
+                                title: errors[keyError]
+                            })
+                        });
+                    }
                 });
         },
 
@@ -363,7 +373,10 @@ var app_events_edit = new Vue({
         capacity: function (newQuestion, oldQuestion) {
             if (newQuestion < 0) {
                 this.capacity = 0;
-                alert("La cantidad no puede ser menor a 0");
+                Toast.fire({
+                    icon: 'warning',
+                    title: 'La cantidad no puede ser menor a 0.'
+                })
             }
         }
 
