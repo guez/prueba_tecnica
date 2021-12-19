@@ -48,7 +48,7 @@ class EventAssistantsController extends Controller
         }
 
         $event = $this->getEvent($field);
-        dispatch_sync(new ProcessEmailAssistants([
+        dispatch(new ProcessEmailAssistants([
             "event_description"=>$event['event_description'],
             "email"=>$event['email'],
             "slug"=>$event['slug'],
