@@ -104,5 +104,10 @@ composer install
 php artisan install:all
 ```
 
+- Now we run the laravel server
+```
+php artisan serve
+```
+
 
 
