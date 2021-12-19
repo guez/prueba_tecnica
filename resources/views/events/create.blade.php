@@ -50,10 +50,6 @@ Listado
         </div>
         
     </form>
-
-    @if(isset($message))
-    <x-alert type="error" :message="$message"/>
-    @endif
     
 </div>
 @endsection
