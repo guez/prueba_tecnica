@@ -4,41 +4,20 @@
 Listado
 @endsection
 @section('content')
-<div class="container mt-4" id="app-edit-events">
+<div class="container mt-4" id="app-edit-categories">
     <div>
-    <span><a href="{{ route("events.index") }}" class=""> Eventos</a></span> /
+    <span><a href="{{ route("categories.index") }}" class=""> Categorías</a></span> /
     <span> Editar</span>
     </div>
     <br>
     
-    <h1>Eventos</h1>
+    <h1>Categorías</h1>
     <hr>
-    <h2>Editar evento</h2>
+    <h2>Editar categoría</h2>
     <div class="row">
         <div class="col-4 mt-2">
             <label>Slug</label>
-            <input name="slug"  required class="form-control" v-model="slug" placeholder="Ingrese un identificador...">
-        </div>
-        <div class="col-4 mt-2">
-            <label>Capacidad</label>
-            <input type="number" name="capacity" required class="form-control" v-model="capacity" placeholder="Ingrese la capacidad del Evento...">
-        </div>
-        <div class="col-4 mt-2">
-            <label>Fecha</label>
-            <input type="date" name="date" required class="form-control" v-model="date" placeholder="Ingrese la fecha del Evento...">
-        </div>
-        <div class="col-4 mt-2">
-            <label>Filtrar por idioma:</label>
-            <input name="idioma" class="form-control" v-model="languageNow" placeholder="Ingrese el idioma de la categoría...">
-        </div>
-        <div class="col-8 mt-2">
-            <label>Categoría</label>
-            <select id="category_id" required name="category_id" class="form-control" v-model="category_id">
-                <option v-for="category in getCategories()" :value="category.id">${ category.description}</option>
-            </select>
-        </div>
-        <div class="col-12 text-center mt-4">
-            <button @click="updateEvent()" class="btn btn-success"><i class="fa fa-sync"></i> Actualizar</button>
+            <input name="slug"  required class="form-control" v-model="slug" placeholder="Ingrese un identificador..." readonly>
         </div>
     </div>
     <br>
@@ -95,20 +74,17 @@ Listado
 @endsection
 
 @section("script")
-    <script src="{{asset('/src/js/event/events.edit.js')}}"></script>
+    <script src="{{asset('/src/js/category/categories.edit.js')}}"></script>
     <script>
-        var data_categories = @json($categories);
-        var event = @json($event);
-        var eventDescriptions = @json($event_descriptions);
+        var category = @json($category);
     
-        app_events_edit.setUrlCreateDescription('{{ route('event_descriptions.store') }}');
-        app_events_edit.setUrlUpdatePartially('{{ route('events.update_partially', $event["id"]) }}');
+        app_categories_edit.setUrlCreateDescription('{{ route('category_descriptions.store') }}');
+        app_categories_edit.setUrlRedirect('{{ route('categories.index') }}');
+         
         
 
-        app_events_edit.setCategories(data_categories);
-        app_events_edit.loadData({
-            descriptions: eventDescriptions,
-            ...event,
+        app_categories_edit.loadData({
+            ...category,
         });
 
     </script>

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EventDescription extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    // , SoftDeletes;
 
     
     protected $fillable = [
@@ -18,17 +19,20 @@ class EventDescription extends Model
     ];
 
 
-    protected $dates = ['deleted_at'];
+    // protected $dates = ['deleted_at'];
 
     public $timestamps = true;
 
+    protected $attributes = [
+        'language' => 'es',
+    ];
     
     /**
      * El evento tiene muchas descripciones asociadas a el.
      */
-    public function events()
+    public function event()
     {
-        return $this->hasMany(App\Models\Event::class);
+        return $this->belongsTo(Event::class)->where('events.deleted_at', ' is not', 'null');
     }
 
 

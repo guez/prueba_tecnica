@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Events;
 
+use App\Exceptions\DisponibilityException;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CategoryDescription;
 use App\Models\Event;
+use App\Models\EventAssistant;
 use App\Models\EventDescription;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Expr\Throw_;
 
 class EventController extends Controller
 {
@@ -51,9 +52,11 @@ class EventController extends Controller
                 'event_description',
                 'capacity'
             )
-            ->paginate();
+            ->get();
 
-        $languages = EventDescription::select('language')->distinct()->get();
+        $languages = Event::query()
+            ->join("event_descriptions", 'events.id','event_descriptions.event_id')
+            ->select('language')->distinct()->get();
         return view('events.index', [
             "events" => $events,
             "languages" => $languages,
@@ -147,7 +150,12 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        //
+        $event = Event::getCategory("es")->findOrFail($id);
+        $eventDescriptions = EventDescription::where("event_id", $event['id'])->get();
+        return view('events.detail', [
+            "event"                 =>  $event,
+            "event_descriptions"    => $eventDescriptions,
+        ]);
     }
 
     /**
@@ -195,6 +203,20 @@ class EventController extends Controller
 
         DB::beginTransaction();
         $event = Event::findOrFail($id);
+        
+        $event->query()
+            ->addSelect('events.id', 'events.capacity', DB::raw('count(event_assistants.id) as assistant'))
+            ->leftJoin('event_assistants', function($query){
+                return $query->on('events.id','=','event_assistants.event_id');
+            })
+            ->where('events.id', '=', $field['event_id'])
+            ->groupBy('events.id','events.capacity')
+            ->first();
+        
+        $assistant = $event['assistant'];
+        $disponibility = $event['capacity'] - $assistant;
+
+
         $event->fill($field);
         $event->update();
 
@@ -250,9 +272,20 @@ class EventController extends Controller
         DB::beginTransaction();
         $event = Event::findOrFail($id);
         if ($field['category_id'] != "")    $event['category_id'] = $field['category_id'];
-        if ($field['capacity'] != "")       $event['capacity'] =    $field['capacity'];
         if ($field['slug'] != "")           $event['slug'] =        $field['slug'];
         if ($field['date'] != "")           $event['date'] =        $field['date'];
+        
+        if ($field['capacity'] != ""){
+            if($event['capacity'] != $field['capacity']){
+                $eventAssistant = EventAssistant::where('event_id', '=', $event['id'])->count();
+                if($eventAssistant > $field['capacity']){
+                    throw new DisponibilityException();
+                }
+                $event['capacity'] = $field['capacity'];
+            }
+                
+        }
+
         $event->update();
         DB::commit();
 
@@ -274,5 +307,11 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
         $event->delete();
+        
+        return new JsonResponse([
+            "state" => true,
+            "code" => 202,
+            "event" => $event
+        ]);
     }
 }

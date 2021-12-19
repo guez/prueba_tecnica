@@ -59,7 +59,7 @@ Listado
 @endsection
 
 @section("script")
-    <script src="{{asset('/src/js/events.create.js')}}"></script>
+    <script src="{{asset('/src/js/event/events.create.js')}}"></script>
     <script>
         var data_categories = @json($categories);
         app_events_create.setCategories(data_categories);

@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::resource("/events", App\Http\Controllers\Events\EventController::class)->except(["store", "update", "delete"]);
 
 Route::get('/', function ()
 {
     return redirect()->route('events.index');
 });
+
+
+
+Route::resource("/events", App\Http\Controllers\Events\EventController::class)->except(["store", "update", "delete"]);
+Route::resource("/categories", App\Http\Controllers\Categories\CategoryController::class)->except(["store", "update", "delete"]);

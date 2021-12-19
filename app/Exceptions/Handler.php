@@ -37,15 +37,28 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    "errors" => [
-                        'message' => 'Recurso no encontrado.'
-                    ]
-                ], 417);
-            }
-        });
+            $this->renderable(function (NotFoundHttpException $e, $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        "errors" => [
+                            'message' => 'Recurso no encontrado.'
+                        ]
+                    ], 404);
+                }
+            });
+
+            
+            $this->renderable(function (DisponibilityException $e, $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        "errors" => [
+                            'message' => 'No hay suficiente capacidad en el Evento.'
+                        ]
+                    ], 417);
+                }
+            });
+
+        
 
         $this->reportable(function (Throwable $e) {
             // dd("safdsf");

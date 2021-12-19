@@ -13,6 +13,6 @@
 
 <script>
     function changeLanguage(event){
-        window.location.href = "{{ route("events.index") }}?language="+event.target.value;
+        window.location.href = "{{ route($redirect) }}?language="+event.target.value;
     }
 </script>

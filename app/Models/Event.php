@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Event extends Model
 {
     use HasFactory, SoftDeletes;
-    
+
     protected $fillable = [
         'category_id',
         'slug',
@@ -18,7 +18,7 @@ class Event extends Model
     ];
 
     protected $dates = ['deleted_at'];
-    
+
     public $timestamps = true;
 
     /**
@@ -29,15 +29,15 @@ class Event extends Model
         return $this->belongsTo(Category::class);
     }
 
-    
+
     /**
      * El evento esta asociado a una categoría en su idioma.
      */
     public function categoryDescription()
     {
-        return $this->hasOne(categoryDescription::class,'category_id','category_id')->where("language", "category_descriptions.language");
+        return $this->hasOne(categoryDescription::class, 'category_id', 'category_id')->where("language", "category_descriptions.language");
     }
-    
+
 
     /**
      * El evento tiene muchas descripciones asociadas a el.
@@ -55,4 +55,15 @@ class Event extends Model
         return $this->hasMany(App\Models\EventAssistant::class);
     }
 
+    /**
+     * El evento puede tener varios asistentes.
+     */
+    public function scopeGetCategory($query, $language)
+    {
+        $subquery = CategoryDescription::query()
+            ->select('category_descriptions.name as category_name')
+            ->where("category_descriptions.category_id", "events.category_id")
+            ->limit(1);
+        $query->addSelect(["category_name" => $subquery]);
+    }
 }

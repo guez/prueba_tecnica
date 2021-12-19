@@ -15,21 +15,21 @@ class CategoryDescription extends Model
         'language',
         'name'
     ];
-    
+
     protected $dates = ['deleted_at'];
-    
+
     public $timestamps = true;
 
+    public function scopeLanguage($query, $language)
+    {
+        $query->where('language', $language);
+    }    
 
-        
-        /**
-         * La categoría tiene asociada a muchas descripciones de categorías.
-         */
-        public function category()
-        {
-            return $this->hasMany(App\Models\Category::class);
-        }
-
-
-
+    /**
+     * La categoría tiene asociada a muchas descripciones de categorías.
+     */
+    public function category()
+    {
+        return $this->hasMany(App\Models\Category::class);
+    }
 }

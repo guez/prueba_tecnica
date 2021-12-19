@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Events;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventDescription;
+use Facade\FlareClient\Http\Exceptions\NotFound;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class EventDescriptionController extends Controller
+class EventDescriptionsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -50,19 +51,13 @@ class EventDescriptionController extends Controller
         $eventDescription = EventDescription::query()
             ->where("event_id", '=', $fields['event_id'])
             ->where("language", '=', $fields['language'])
-            ->withTrashed()
             ->first();
 
         if ($eventDescription != null) {
             $eventDescription->name = $fields['name'];
             $eventDescription->update();
             $typeEvent = "UPDATE";
-            if($eventDescription->trashed())
-            {
-                $eventDescription->restore();
-                $typeEvent = "RESTORE";
-            }
-            return new Jsonresponse([
+            return new JsonResponse([
                 "state" => true,
                 "code" => 200,
                 "event_description" => $eventDescription,
@@ -73,7 +68,7 @@ class EventDescriptionController extends Controller
         $eventDescription = new EventDescription($fields);
         $eventDescription->save();
 
-        return new Jsonresponse([
+        return new JsonResponse([
             "state" => true,
             "code" => 202,
             "event_description" => $eventDescription,
@@ -107,7 +102,26 @@ class EventDescriptionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return new JsonResponse($request->all());
+        $field = $request->validate([
+            "name" => "required|max:255",
+            "id" => "required|exists:events,id",
+            "language" => ""
+        ]);
+        if ($field['language'] == "") $field['language'] = "es";
+
+        $eventDescription = EventDescription::where('language', $field['language'])->first();
+        if($eventDescription == false){
+            throw new NotFound();
+        }
+
+        $eventDescription->name = $field['name'];
+        
+        return new JsonResponse([
+            "state" => true,
+            "code" => 200,
+            "event_description" => $eventDescription
+        ]);
+        
     }
 
     /**
@@ -121,7 +135,7 @@ class EventDescriptionController extends Controller
         $eventDescription = EventDescription::findOrFail($id);
         $eventDescription->delete();
         
-        return new Jsonresponse([
+        return new JsonResponse([
             "state" => true,
             "code" => 200,
             "event_description" => $eventDescription
